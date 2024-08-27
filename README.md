@@ -1,11 +1,17 @@
 # YourlsSDK
 
+## Installation
+
+```bash
+composer require cocochepeau/yourls-php-sdk
+```
+
 ## Example Usage
 
 ```php
 
 // Initialize the SDK
-$yourls = new YourlsSDK('http://sho.rt/yourls-api.php', 'your_username', 'your_password');
+$yourls = new \Cocochepeau\YourlsPhpSdk\YourlsSDK('http://sho.rt/yourls-api.php', 'your_username', 'your_password');
 
 // Create a short URL
 try {
