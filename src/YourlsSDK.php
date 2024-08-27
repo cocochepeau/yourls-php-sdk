@@ -1,5 +1,7 @@
 <?php
 
+namespace Cocochepeau\YourlsPhpSdk;
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
