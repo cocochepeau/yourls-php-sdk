@@ -1,0 +1,11 @@
+{
+    "name": "cocochepeau/yourls-php-sdk",
+    "autoload": {
+        "psr-4": {
+            "Cocochepeau\\YourlsPhpSdk\\": "src/"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
