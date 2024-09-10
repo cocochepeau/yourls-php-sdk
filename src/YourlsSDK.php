@@ -9,14 +9,10 @@ class YourlsSDK
 {
     private Client $client;
     private string $apiUrl;
-    private string $username;
-    private string $password;
 
-    public function __construct(string $apiUrl, string $username, string $password, float $timeout = 5.0)
+    public function __construct(string $apiUrl, private string $username, private string $password, float $timeout = 5.0)
     {
         $this->apiUrl = rtrim($apiUrl, '/');
-        $this->username = $username;
-        $this->password = $password;
         $this->client = new Client([
             'base_uri' => $this->apiUrl,
             'timeout'  => $timeout, // Set the default timeout for requests
@@ -40,7 +36,7 @@ class YourlsSDK
             $body = $response->getBody();
             return json_decode($body, true);
         } catch (GuzzleException $e) {
-            throw new Exception('Request failed: ' . $e->getMessage());
+            throw new Exception('Request failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 

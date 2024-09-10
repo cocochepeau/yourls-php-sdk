@@ -20,7 +20,7 @@ class YourlsSDKTest extends TestCase
         $reflection->setValue($sdk, $mockClient);
 
         $shortUrl = $sdk->createShortUrl('http://example.com');
-        $this->assertEquals('http://sho.rt/1f', $shortUrl);
+        $this->assertSame('http://sho.rt/1f', $shortUrl);
     }
 
     public function testExpandShortUrl()
@@ -38,7 +38,7 @@ class YourlsSDKTest extends TestCase
         $reflection->setValue($sdk, $mockClient);
 
         $longUrl = $sdk->expandShortUrl('short-keyword');
-        $this->assertEquals('http://example.com', $longUrl);
+        $this->assertSame('http://example.com', $longUrl);
     }
 
     public function testGetUrlStats()
@@ -57,6 +57,6 @@ class YourlsSDKTest extends TestCase
 
         $stats = $sdk->getUrlStats('short-keyword');
         $this->assertArrayHasKey('message', $stats);
-        $this->assertEquals('success', $stats['message']);
+        $this->assertSame('success', $stats['message']);
     }
 }
