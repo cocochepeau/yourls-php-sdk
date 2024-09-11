@@ -2,17 +2,12 @@
 
 declare(strict_types=1);
 
-use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    // Ensure file system caching is used instead of in-memory.
-    $rectorConfig->cacheClass(FileCacheStorage::class);
-    $rectorConfig->cacheDirectory('./build/cache/rector');
-
     $rectorConfig->paths([
         __DIR__ . '/src',
         __DIR__ . '/tests',
