@@ -15,7 +15,7 @@ class YourlsSDK
         $this->apiUrl = rtrim($apiUrl, '/');
         $this->client = new Client([
             'base_uri' => $this->apiUrl,
-            'timeout'  => $timeout, // Set the default timeout for requests
+            'timeout' => $timeout, // Set the default timeout for requests
         ]);
     }
 
@@ -30,7 +30,7 @@ class YourlsSDK
     {
         try {
             $response = $this->client->post('', [
-                'form_params' => $params
+                'form_params' => $params,
             ]);
 
             $body = $response->getBody();
@@ -178,4 +178,41 @@ class YourlsSDK
 
         return $response;
     }
+
+    /*
+     * https://github.com/claytondaley/yourls-api-delete
+     */
+    public function deleteByShortUrl(string $shortUrl)
+    {
+        $params = [
+            'action' => 'delete',
+            'shorturl' => $shortUrl,
+            'format' => 'json',
+            'username' => $this->username,
+            'password' => $this->password,
+        ];
+        $response = $this->sendRequest($params);
+
+        if ($response['statusCode'] !== 200) {
+            throw new \RuntimeException('Error: ' . $response['message']);
+        }
+    }
+    
+    public function findByLongUrl(string $longUrl)
+    {
+        $params = [
+            'action' => 'lookup-url-substr',
+            'substr' => $longUrl,
+            'format' => 'json',
+            'username' => $this->username,
+            'password' => $this->password,
+        ];
+        $response = $this->sendRequest($params);
+        if ($response['statusCode'] !== 200) {
+            throw new \RuntimeException('Error: ' . $response['message']);
+        }
+        return $response['keywords'];
+    }
+
+
 }
