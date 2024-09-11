@@ -198,7 +198,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new Exception('Error: ' . $response['message']);
+            throw new \RuntimeException('Error: ' . $response['message']);
         }
     }
 }
