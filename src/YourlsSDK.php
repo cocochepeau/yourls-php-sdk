@@ -11,14 +11,14 @@ class YourlsSDK
     private Client $client;
 
     public function __construct(
-        string $apiUrl,
+        private string $apiUrl,
         private readonly string $username,
         private readonly string $password,
         float $timeout = 5.0,
     ) {
-        $apiUrl = rtrim($apiUrl, '/');
+        $this->apiUrl = rtrim($this->apiUrl, '/');
         $this->client = new Client([
-            'base_uri' => $apiUrl,
+            'base_uri' => $this->apiUrl,
             'timeout' => $timeout, // Set the default timeout for requests
         ]);
     }
@@ -49,6 +49,9 @@ class YourlsSDK
         }
 
         $response = $this->sendRequest($params);
+        if ($response->getBody()['status'] === 'fail' && is_array($response->getBody()['url'])) {
+            return $this->apiUrl . $response->getBody()['url']['keyword'];
+        }
 
         if ($response['status'] !== 'success') {
             throw new RuntimeException('Error: ' . $response['message']);
@@ -172,7 +175,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new \RuntimeException('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
     }
 
@@ -187,7 +190,7 @@ class YourlsSDK
         ];
         $response = $this->sendRequest($params);
         if ($response['statusCode'] !== 200) {
-            throw new \RuntimeException('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
         return $response['keywords'];
     }
@@ -209,17 +212,15 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new \RuntimeException('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
     }
 
     /**
-     * Send an API request.
-     *
      * @param array $params The parameters to send with the request.
      * @return array The decoded JSON response.
      */
-    private function sendRequest(array $params): array
+    private function sendRequest(array $params): Response
     {
         try {
             $response = $this->client->post('', [
@@ -227,9 +228,27 @@ class YourlsSDK
             ]);
 
             $body = $response->getBody();
-            return json_decode($body, true);
+            return new Response($response->getStatusCode(), json_decode($body, true));
         } catch (GuzzleException $e) {
-            throw new RuntimeException('Request failed: ' . $e->getMessage());
+            return new Response(
+                $e->getResponse()->getStatusCode(),
+                json_decode($e->getResponse()->getBody(), true),
+            );
         }
+    }
+}
+
+class Response
+{
+    public function __construct(private int $statusCode, private array $body) {}
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    public function getBody(): array
+    {
+        return $this->body;
     }
 }
