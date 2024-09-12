@@ -49,11 +49,13 @@ class YourlsSDK
         }
 
         $response = $this->sendRequest($params);
-        if ($response->getBody()['status'] === 'fail' && is_array($response->getBody()['url'])) {
+
+        // Return already existing ShortURL
+        if ($response->getStatus() === 'fail' && is_array($response->getBody()['url'])) {
             return $this->apiUrl . $response->getBody()['url']['keyword'];
         }
 
-        if ($response['status'] !== 'success') {
+        if ($response->hasInvalidStatus()) {
             throw new RuntimeException('Error: ' . $response['message']);
         }
 
@@ -220,7 +222,7 @@ class YourlsSDK
      * @param array $params The parameters to send with the request.
      * @return array The decoded JSON response.
      */
-    private function sendRequest(array $params): Response
+    private function sendRequest(array $params): YourlsResponse
     {
         try {
             $response = $this->client->post('', [
@@ -228,9 +230,9 @@ class YourlsSDK
             ]);
 
             $body = $response->getBody();
-            return new Response($response->getStatusCode(), json_decode($body, true));
+            return new YourlsResponse($response->getStatusCode(), json_decode($body, true));
         } catch (GuzzleException $e) {
-            return new Response(
+            return new YourlsResponse(
                 $e->getResponse()->getStatusCode(),
                 json_decode($e->getResponse()->getBody(), true),
             );
@@ -238,9 +240,14 @@ class YourlsSDK
     }
 }
 
-class Response
+class YourlsResponse
 {
-    public function __construct(private int $statusCode, private array $body) {}
+    private array $body;
+
+    public function __construct(private int $statusCode, string $body)
+    {
+        $this->body = json_decode($body, true);
+    }
 
     public function getStatusCode(): int
     {
@@ -250,5 +257,15 @@ class Response
     public function getBody(): array
     {
         return $this->body;
+    }
+
+    public function hasInvalidStatus(): bool
+    {
+        return $this->body['status'] !== 'success';
+    }
+
+    public function getStatus(): string
+    {
+        return $this->body['status'];
     }
 }
