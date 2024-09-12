@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use Cocochepeau\YourlsPhpSdk\YourlsSDK; // Adjust the namespace as necessary
+use Cocochepeau\YourlsPhpSdk\YourlsSDK;
+use PHPUnit\Framework\TestCase; // Adjust the namespace as necessary
 
 class YourlsSDKTest extends TestCase
 {
@@ -9,10 +9,10 @@ class YourlsSDKTest extends TestCase
     {
         $mockClient = $this->createMock(GuzzleHttp\Client::class);
         $mockClient->method('post')
-                   ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
-                       'status' => 'success',
-                       'shorturl' => 'http://sho.rt/1f'
-                   ])));
+            ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
+                'status' => 'success',
+                'shorturl' => 'http://sho.rt/1f',
+            ])));
 
         $sdk = new YourlsSDK('http://sho.rt/yourls-api.php', 'username', 'password');
         $reflection = new ReflectionProperty($sdk, 'client');
@@ -27,10 +27,10 @@ class YourlsSDKTest extends TestCase
     {
         $mockClient = $this->createMock(GuzzleHttp\Client::class);
         $mockClient->method('post')
-                   ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
-                       'statusCode' => 200,
-                       'longurl' => 'http://example.com'
-                   ])));
+            ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
+                'statusCode' => 200,
+                'longurl' => 'http://example.com',
+            ])));
 
         $sdk = new YourlsSDK('http://sho.rt/yourls-api.php', 'username', 'password');
         $reflection = new ReflectionProperty($sdk, 'client');
@@ -45,17 +45,17 @@ class YourlsSDKTest extends TestCase
     {
         $mockClient = $this->createMock(GuzzleHttp\Client::class);
         $mockClient->method('post')
-                   ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
-                       'statusCode' => 200,
-                       'message' => 'success'
-                   ])));
+            ->willReturn(new GuzzleHttp\Psr7\Response(200, [], json_encode([
+                'statusCode' => 200,
+                'message' => 'success',
+            ])));
 
         $sdk = new YourlsSDK('http://sho.rt/yourls-api.php', 'username', 'password');
         $reflection = new ReflectionProperty($sdk, 'client');
         $reflection->setAccessible(true);
         $reflection->setValue($sdk, $mockClient);
 
-        $stats = $sdk->getUrlStats('short-keyword');
+        $stats = $sdk->getShortUrlStats('short-keyword');
         $this->assertArrayHasKey('message', $stats);
         $this->assertSame('success', $stats['message']);
     }

@@ -6,6 +6,14 @@
 composer require cocochepeau/yourls-php-sdk
 ```
 
+## local development
+```
+docker run -it -v $PWD:/app -w /app -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK  -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -e SSH_AGENT_PID=$SSH_AGENT_PID --add-host=host.docker.internal:host-gateway composer:2.1 bash
+composer up
+vendor/bin/ecs
+vendor/bin/rector
+````
+
 ## Example Usage
 
 ```php
@@ -31,7 +39,7 @@ try {
 
 // Get stats for a specific short URL
 try {
-    $stats = $yourls->getUrlStats('custom-keyword');
+    $stats = $yourls->getShortUrlStats('custom-keyword');
     print_r($stats);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
@@ -45,4 +53,24 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 
+try {
+    $yourls->deleteByShortUrl($shortUrl);
+    echo "Deleted\n";
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
+
+try {
+    $longUrl = $yourls->findByLongUrl('http://example.com');
+    echo $longUrl;
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
+
+try {
+    $yourls->updateShortUrlTarget('http://localhost:8080/hwxbp', 'http://google.com');
+    echo "Updated\n";
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 ```
