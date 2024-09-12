@@ -216,4 +216,25 @@ class YourlsSDK
     }
 
 
+
+    /*
+     * For Plugin https://github.com/timcrockford/yourls-api-edit-url
+     */
+    public function updateShortUrlTarget(string $shortUrl, string $targetUrl): void
+    {
+        $params = [
+            'action' => 'update',
+            'shorturl' => $shortUrl,
+            'url' => $targetUrl,
+            'format' => 'json',
+            'username' => $this->username,
+            'password' => $this->password,
+        ];
+
+        $response = $this->sendRequest($params);
+
+        if ($response['statusCode'] !== 200) {
+            throw new \RuntimeException('Error: ' . $response['message']);
+        }
+    }
 }
