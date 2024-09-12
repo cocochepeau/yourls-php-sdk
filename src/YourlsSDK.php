@@ -10,17 +10,15 @@ class YourlsSDK
 {
     private Client $client;
 
-    private string $apiUrl;
-
     public function __construct(
         string $apiUrl,
-        private string $username,
-        private string $password,
-        float $timeout = 5.0
+        private readonly string $username,
+        private readonly string $password,
+        float $timeout = 5.0,
     ) {
-        $this->apiUrl = rtrim($apiUrl, '/');
+        $apiUrl = rtrim($apiUrl, '/');
         $this->client = new Client([
-            'base_uri' => $this->apiUrl,
+            'base_uri' => $apiUrl,
             'timeout' => $timeout, // Set the default timeout for requests
         ]);
     }
