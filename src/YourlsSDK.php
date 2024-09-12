@@ -4,6 +4,7 @@ namespace Cocochepeau\YourlsPhpSdk;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use RuntimeException;
 
 class YourlsSDK
 {
@@ -15,7 +16,7 @@ class YourlsSDK
         $this->apiUrl = rtrim($apiUrl, '/');
         $this->client = new Client([
             'base_uri' => $this->apiUrl,
-            'timeout'  => $timeout, // Set the default timeout for requests
+            'timeout' => $timeout, // Set the default timeout for requests
         ]);
     }
 
@@ -24,19 +25,19 @@ class YourlsSDK
      *
      * @param array $params The parameters to send with the request.
      * @return array The decoded JSON response.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     private function sendRequest(array $params): array
     {
         try {
             $response = $this->client->post('', [
-                'form_params' => $params
+                'form_params' => $params,
             ]);
 
             $body = $response->getBody();
             return json_decode($body, true);
         } catch (GuzzleException $e) {
-            throw new Exception('Request failed: ' . $e->getMessage(), $e->getCode(), $e);
+            throw new RuntimeException('Request failed: ' . $e->getMessage());
         }
     }
 
@@ -47,7 +48,7 @@ class YourlsSDK
      * @param string|null $keyword An optional custom keyword for the short URL.
      * @param string|null $title An optional title for the short URL.
      * @return string The generated short URL.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     public function createShortUrl(string $url, ?string $keyword = null, ?string $title = null): string
     {
@@ -69,7 +70,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['status'] !== 'success') {
-            throw new Exception('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
 
         return $response['shorturl'];
@@ -80,7 +81,7 @@ class YourlsSDK
      *
      * @param string $shortUrl The short URL to expand.
      * @return string The original long URL.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     public function expandShortUrl(string $shortUrl): string
     {
@@ -95,7 +96,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new Exception('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
 
         return $response['longurl'];
@@ -106,7 +107,7 @@ class YourlsSDK
      *
      * @param string $shortUrl The short URL to get statistics for.
      * @return array The statistics for the short URL.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     public function getUrlStats(string $shortUrl): array
     {
@@ -121,7 +122,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new Exception('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
 
         return $response;
@@ -133,7 +134,7 @@ class YourlsSDK
      * @param string $filter The filter to apply ("top", "bottom", "rand", "last").
      * @param int $limit The maximum number of links to return.
      * @return array The statistics for the short URLs.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     public function getStats(string $filter = 'top', int $limit = 10): array
     {
@@ -149,7 +150,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new Exception('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
 
         return $response;
@@ -159,7 +160,7 @@ class YourlsSDK
      * Get global statistics for the YOURLS installation.
      *
      * @return array The global statistics.
-     * @throws Exception If the request fails.
+     * @throws RuntimeException If the request fails.
      */
     public function getDbStats(): array
     {
@@ -173,7 +174,7 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         if ($response['statusCode'] !== 200) {
-            throw new Exception('Error: ' . $response['message']);
+            throw new RuntimeException('Error: ' . $response['message']);
         }
 
         return $response;
