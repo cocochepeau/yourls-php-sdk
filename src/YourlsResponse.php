@@ -13,8 +13,12 @@ class YourlsResponse
     private array $body;
     private int $statusCode;
 
-    public function __construct(Response $response)
+    public function __construct(?\Psr\Http\Message\ResponseInterface $response)
     {
+        if ($response === null) {
+            $this->statusCode = 500;
+            return;
+        }
         $this->body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->statusCode = $response->getStatusCode();
     }

@@ -4,6 +4,7 @@ namespace Cocochepeau\YourlsPhpSdk;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
 
 class YourlsSDK
@@ -85,11 +86,11 @@ class YourlsSDK
 
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
 
-        return $response['longurl'];
+        return $response->getBody()['longurl'];
     }
 
     /**
@@ -108,11 +109,11 @@ class YourlsSDK
 
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
 
-        return $response;
+        return $response->getBody();
     }
 
     /**
@@ -133,11 +134,11 @@ class YourlsSDK
 
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
 
-        return $response;
+        return $response->getBody();
     }
 
     /**
@@ -154,17 +155,17 @@ class YourlsSDK
 
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
 
-        return $response;
+        return $response->getBody();
     }
 
     /*
      * https://github.com/claytondaley/yourls-api-delete
      */
-    public function deleteByShortUrl(string $shortUrl)
+    public function deleteByShortUrl(string $shortUrl): void
     {
         $params = [
             'action' => 'delete',
@@ -173,12 +174,12 @@ class YourlsSDK
         ];
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
     }
 
-    public function findByLongUrl(string $longUrl)
+    public function findByLongUrl(string $longUrl): string
     {
         $params = [
             'action' => 'lookup-url-substr',
@@ -187,10 +188,10 @@ class YourlsSDK
         ];
 
         $response = $this->sendRequest($params);
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
-        return $response['keywords'];
+        return $response->getBody()['keywords'];
     }
 
     /*
@@ -208,8 +209,8 @@ class YourlsSDK
 
         $response = $this->sendRequest($params);
 
-        if ($response['statusCode'] !== 200) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
     }
 
@@ -227,11 +228,11 @@ class YourlsSDK
             $response = $this->client->post('', [
                 'form_params' => $yourlsApiParams,
             ]);
-        } catch (GuzzleException $e) {
+        } catch (RequestException $e) {
             $response = $e->getResponse();
         } finally {
             return new YourlsResponse(
-                $response,
+                $response ?? null,
             );
         }
     }
