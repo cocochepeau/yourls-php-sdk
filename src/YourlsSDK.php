@@ -37,8 +37,6 @@ class YourlsSDK
             'action' => 'shorturl',
             'url' => $url,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
 
         if ($keyword) {
@@ -51,15 +49,24 @@ class YourlsSDK
         $response = $this->sendRequest($params);
 
         // Return already existing ShortURL
-        if ($response->getStatus() === 'fail' && is_array($response->getBody()['url'])) {
-            return $this->apiUrl . $response->getBody()['url']['keyword'];
+        if (!$response->isValid() && is_array($response->getBody()['url'])) {
+            return $this->getDomainFromUrl($this->apiUrl) . '/' . $response->getBody()['url']['keyword'];
         }
 
-        if ($response->hasInvalidStatus()) {
-            throw new RuntimeException('Error: ' . $response['message']);
+        if (!$response->isValid()) {
+            throw new RuntimeException('Error: ' . $response->getMessage());
         }
 
-        return $response['shorturl'];
+        return $response->getBody()['shorturl'];
+    }
+
+    private function getDomainFromUrl(string $url): string
+    {
+        // Parse the URL and extract the host (domain)
+        $parsedUrl = parse_url($url);
+
+        // Return the 'host' if available, otherwise fallback to an empty string
+        return $parsedUrl['host'] ?? '';
     }
 
     /**
@@ -74,8 +81,6 @@ class YourlsSDK
             'action' => 'expand',
             'shorturl' => $shortUrl,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
 
         $response = $this->sendRequest($params);
@@ -99,8 +104,6 @@ class YourlsSDK
             'action' => 'url-stats',
             'shorturl' => $shortUrl,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
 
         $response = $this->sendRequest($params);
@@ -126,8 +129,6 @@ class YourlsSDK
             'filter' => $filter,
             'limit' => $limit,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
 
         $response = $this->sendRequest($params);
@@ -149,8 +150,6 @@ class YourlsSDK
         $params = [
             'action' => 'db-stats',
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
 
         $response = $this->sendRequest($params);
@@ -171,8 +170,6 @@ class YourlsSDK
             'action' => 'delete',
             'shorturl' => $shortUrl,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
         $response = $this->sendRequest($params);
 
@@ -187,9 +184,8 @@ class YourlsSDK
             'action' => 'lookup-url-substr',
             'substr' => $longUrl,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
+
         $response = $this->sendRequest($params);
         if ($response['statusCode'] !== 200) {
             throw new RuntimeException('Error: ' . $response['message']);
@@ -207,9 +203,8 @@ class YourlsSDK
             'shorturl' => $shortUrl,
             'url' => $targetUrl,
             'format' => 'json',
-            'username' => $this->username,
-            'password' => $this->password,
         ];
+        $this->addCredentials($params);
 
         $response = $this->sendRequest($params);
 
@@ -218,54 +213,26 @@ class YourlsSDK
         }
     }
 
-    /**
-     * @param array $params The parameters to send with the request.
-     * @return array The decoded JSON response.
-     */
-    private function sendRequest(array $params): YourlsResponse
+    private function addCredentials(array $request): array
     {
+        $request     ['username'] = $this->username;
+        $request ['password'] = $this->password;
+        return $request;
+    }
+
+    private function sendRequest(array $yourlsApiParams): YourlsResponse
+    {
+        $yourlsApiParams = $this->addCredentials($yourlsApiParams);
         try {
             $response = $this->client->post('', [
-                'form_params' => $params,
+                'form_params' => $yourlsApiParams,
             ]);
-
-            $body = $response->getBody();
-            return new YourlsResponse($response->getStatusCode(), json_decode($body, true));
         } catch (GuzzleException $e) {
+            $response = $e->getResponse();
+        } finally {
             return new YourlsResponse(
-                $e->getResponse()->getStatusCode(),
-                json_decode($e->getResponse()->getBody(), true),
+                $response,
             );
         }
-    }
-}
-
-class YourlsResponse
-{
-    private array $body;
-
-    public function __construct(private int $statusCode, string $body)
-    {
-        $this->body = json_decode($body, true);
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->statusCode;
-    }
-
-    public function getBody(): array
-    {
-        return $this->body;
-    }
-
-    public function hasInvalidStatus(): bool
-    {
-        return $this->body['status'] !== 'success';
-    }
-
-    public function getStatus(): string
-    {
-        return $this->body['status'];
     }
 }
