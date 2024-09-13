@@ -1,0 +1,40 @@
+{
+    "name": "mehrkanal/yourls-php-sdk",
+    "description": "A PHP SDK for interacting with the YOURLS API, enabling URL shortening, expansion, and statistics retrieval.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Mehrkanal\\YourlsPhpSdk\\": "src/"
+        }
+    },    "autoload-dev": {
+        "psr-4": {
+            "Mehrkanal\\YourlsPhpSdkTest\\": "tests/"
+        }
+    },
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Thomas Eimers",
+            "email": "eimers@mehrkanal.com"
+        },
+        {
+            "name": "Corentin Chepeau",
+            "email": "corentin.chepeau@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "phpunit --bootstrap vendor/autoload.php tests"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "guzzlehttp/guzzle": "^7.0",
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "rector/rector": "^1.2",
+        "symplify/easy-coding-standard": "^12.0.0",
+        "phpstan/phpstan": "^1.9.6",
+        "jetbrains/phpstorm-attributes": "^1.1"
+    }
+}
