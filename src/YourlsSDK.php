@@ -3,7 +3,6 @@
 namespace Cocochepeau\YourlsPhpSdk;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
 
@@ -179,7 +178,7 @@ class YourlsSDK
         }
     }
 
-    public function findByLongUrl(string $longUrl): string
+    public function findByLongUrl(string $longUrl): FindLongUrlResponse
     {
         $params = [
             'action' => 'lookup-url-substr',
@@ -191,7 +190,8 @@ class YourlsSDK
         if (!$response->isValid()) {
             throw new RuntimeException('Error: ' . $response->getMessage());
         }
-        return $response->getBody()['keywords'];
+        
+        return new FindLongUrlResponse($response);
     }
 
     /*

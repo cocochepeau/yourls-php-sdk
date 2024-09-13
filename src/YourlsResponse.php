@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Cocochepeau\YourlsPhpSdk;
+namespace Mehrkanal\YourlsPhpSdk;
 
-use GuzzleHttp\Psr7\Response;
 use JetBrains\PhpStorm\ArrayShape;
+use Psr\Http\Message\ResponseInterface;
 
 class YourlsResponse
 {
-    #[ArrayShape(['message' => 'string', 'errorCode' => 'int'])]
     private array $body;
     private int $statusCode;
 
-    public function __construct(?\Psr\Http\Message\ResponseInterface $response)
+    public function __construct(?ResponseInterface $response)
     {
         if ($response === null) {
             $this->statusCode = 500;
@@ -28,6 +27,7 @@ class YourlsResponse
         return $this->statusCode;
     }
 
+    #[ArrayShape(['message' => 'string', 'errorCode' => 'int'])]
     public function getBody(): array
     {
         return $this->body;
@@ -40,9 +40,7 @@ class YourlsResponse
 
     public function isValid(): bool
     {
-        return
-            $this->statusCode >= 200 && $this->statusCode < 300 &&
-            $this->body['status'] === 'success';
+        return $this->statusCode >= 200 && $this->statusCode < 300;
     }
 
     public function getStatus(): string
