@@ -1,14 +1,18 @@
 {
-    "name": "cocochepeau/yourls-php-sdk",
+    "name": "mehrkanal/yourls-php-sdk",
     "description": "A PHP SDK for interacting with the YOURLS API, enabling URL shortening, expansion, and statistics retrieval.",
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Cocochepeau\\YourlsPhpSdk\\": "src/"
+            "Mehrkanal\\YourlsPhpSdk\\": "src/"
         }
     },
     "license": "GPL-3.0-or-later",
     "authors": [
+        {
+            "name": "Thomas Eimers",
+            "email": "eimers@mehrkanal.com"
+        },
         {
             "name": "Corentin Chepeau",
             "email": "corentin.chepeau@gmail.com"
